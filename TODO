@@ -1,0 +1,8 @@
+- lots of temporary files (.log, .dvi, etc) get left around. need to somehow
+  tell python to exit cleanly at the end, and maybe also use a different
+  temporary directory.
+- an array of tuples doesn't seem to get converted correctly? eg,
+  zip(1:10, 1:10)
+- create native "PyxGraph", "PyxCanvas" types
+- integration of SVG renders into, eg, Jupyter. Python3 only.
+- python2 vs. python3 versions of PyX
