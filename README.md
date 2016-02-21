@@ -22,6 +22,10 @@ There are no installation instructions.
 
 ## Notes and Caveats
 
+To run tests, do something like:
+
+    JULIA_LOAD_PATH=src julia test/runtests.jl
+
 PyX >= 0.13 (2013) is Python3 only. PyX <= 0.12.1 is Python2.
 
 Instead of Python's `None`, use Julia's `nothing`.
