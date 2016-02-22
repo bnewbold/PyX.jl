@@ -12,8 +12,9 @@ export graph, graph_axis, graph_axis_painter, graph_data, graph_style, graph_sty
 export graph_graphxyz, graph_data_function
 export epsfile, deformer, trafo, attr, metapost_path
 export plot, stroke
-export writeEPSfile, writePDFfile, writeSVGfile
+export writeEPSfile, writePDFfile
 export pyx_fill, pyx_append, pyx_insert, pyx_text
+# See also Python3 section at end
 
 canvas = pywrap(pyimport("pyx.canvas"))
 path = pywrap(pyimport("pyx.path"))
@@ -88,8 +89,12 @@ function writePDFfile(g::PyObject, args...; kwargs...)
     return g[:writePDFfile](args...; kwargs...)
 end
 
-function writeSVGfile(g::PyObject, args...; kwargs...)
-    return g[:writeSVGfile](args...; kwargs...)
+# Some newer features only in recent (Python3) versions of PyX
+if PyCall.pyversion > v"3"
+    export writeSVGfile
+    function writeSVGfile(g::PyObject, args...; kwargs...)
+        return g[:writeSVGfile](args...; kwargs...)
+    end
 end
 
 end # module PyX

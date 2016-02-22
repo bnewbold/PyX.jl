@@ -10,7 +10,7 @@ It is a work in progress, broken, and will set your computer on fire.
 using PyX
 
 g = graph.graphxy(width=8)
-plot(graph_data_function("y(x)=sin(x)/x", min=-15, max=15))
+plot(g, graph_data_function("y(x)=sin(x)/x", min=-15, max=15))
 writeEPSfile(g, "function")
 writePDFfile(g, "function")
 writeSVGfile(g, "function")
