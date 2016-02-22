@@ -15,9 +15,9 @@
 using PyX
 
 g = graph.graphxy(width=8)
-plot(g, graph_data.values(x=1:10, y=1:10))
+plot(g, graph_data.values(x=0:9, y=0:9))
 # XXX: x, y syntax in Python3 version only
 # XXX: also other errors
-#plot(g, graph_data.points([[i i] for i in 1:10], 1:10), x=1, y=2)
+#plot(g, graph_data.points([[i i] for i in 0:9], 0:9), x=1, y=2)
 writeEPSfile(g, "points")
 writePDFfile(g, "points")
