@@ -33,5 +33,10 @@ Instead of Python's `None`, use Julia's `nothing`.
 `graph_data.function` won't work in Julia because `function` is a reserved
 word. Use `graph_data_function` instead.
 
+To avoid namespace collisions or confusion with built-in Julia functions the
+following functions have "pyx_" preprended to the function name:
+
+    pyx_fill, pyx_append, pyx_insert, pyx_text
+
 Also check the TODO file.
 
