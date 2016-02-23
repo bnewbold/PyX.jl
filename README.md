@@ -40,3 +40,5 @@ following functions have "pyx_" preprended to the function name:
 
 Also check the TODO file.
 
+For pipeGS (ghostscript file conversion) output, see:
+http://www.ghostscript.com/doc/current/Devices.htm

@@ -1,9 +1,51 @@
 
 module PyX
 
+####### Required and over-written
 using PyCall
-using LaTeXStrings
+import PyCall: pycall
+import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 
+
+# LaTeXStrings is strongly recommended but not required
+
+####### Types
+export PyxCanvas
+# Wrapper around PyX PyxCanvas, supporting graphics I/O and pretty display
+# Based on PyPlot's Figure type
+type PyxCanvas
+    o::PyObject
+end
+
+PyObject(f::PyxCanvas) = f.o
+convert(::Type{PyxCanvas}, o::PyObject) = PyxCanvas(o)
+==(f::PyxCanvas, g::PyxCanvas) = f.o == g.o
+==(f::PyxCanvas, g::PyObject) = f.o == g
+==(f::PyObject, g::PyxCanvas) = f == g.o
+hash(f::PyxCanvas) = hash(f.o)
+pycall(f::PyxCanvas, args...; kws...) = pycall(f.o, args...; kws...)
+Base.call(f::PyxCanvas, args...; kws...) = pycall(f.o, PyAny, args...; kws...)
+Base.Docs.doc(f::PyxCanvas) = Base.Docs.doc(f.o)
+getindex(f::PyxCanvas, x) = getindex(f.o, x)
+setindex!(f::PyxCanvas, v, x) = setindex!(f.o, v, x)
+haskey(f::PyxCanvas, x) = haskey(f.o, x)
+keys(f::PyxCanvas) = keys(f.o)
+
+mimewritable(::MIME"application/eps", c::PyxCanvas) = !isempty(c.o[:items])
+mimewritable(::MIME"image/eps", c::PyxCanvas) = !isempty(c.o[:items])
+mimewritable(::MIME"application/pdf", c::PyxCanvas) = !isempty(c.o[:items])
+mimewritable(::MIME"application/postscript", c::PyxCanvas) = !isempty(c.o[:items])
+mimewritable(::MIME"image/png", c::PyxCanvas) = !isempty(c.o[:items])
+mimewritable(::MIME"image/jpeg", c::PyxCanvas) = !isempty(c.o[:items])
+
+writemime(io::IO, ::MIME"application/pdf", c::PyxCanvas) = writePDFfile(c, io)
+writemime(io::IO, ::MIME"application/eps", c::PyxCanvas) = writeEPSfile(c, io)
+writemime(io::IO, ::MIME"image/eps", c::PyxCanvas) = writeEPSfile(c, io)
+writemime(io::IO, ::MIME"application/postscript", c::PyxCanvas) = writePSfile(c, io)
+writemime(io::IO, ::MIME"image/png", c::PyxCanvas) = writeGSfile(c, io, "png16m")
+writemime(io::IO, ::MIME"image/jpeg", c::PyxCanvas) = writeGSfile(c, io, "jpeg")
+
+####### Exports
 export canvas, path, deco, deco_stroked, deco_filled
 export connector, text, text_halign, text_valign, box
 export style, style_linewidth, style_linestyle, style_linejoin, style_linecap
@@ -12,10 +54,11 @@ export graph, graph_axis, graph_axis_painter, graph_data, graph_style, graph_sty
 export graph_graphxyz, graph_data_function
 export epsfile, deformer, trafo, attr, metapost_path
 export plot, stroke
-export writeEPSfile, writePDFfile
+export writeEPSfile, writePDFfile, writeGSfile, pipeGS
 export pyx_fill, pyx_append, pyx_insert, pyx_text
 # See also Python3 section at end
 
+####### Create virtual (pywrap) Julia modules for PyX python sub-modules
 canvas = pywrap(pyimport("pyx.canvas"))
 path = pywrap(pyimport("pyx.path"))
 deco = pywrap(pyimport("pyx.deco"))
@@ -51,50 +94,43 @@ trafo = pywrap(pyimport("pyx.trafo"))
 attr = pywrap(pyimport("pyx.attr"))
 metapost_path = pywrap(pyimport("pyx.metapost.path"))
 
-function plot(g::PyObject, args...; kwargs...)
-    # g should be Graph object
-    return g[:plot](args...; kwargs...)
-end
+####### Wrapper Functions
+plot(g::PyObject, a...; k...) = g[:plot](a...; k...)
+plot(g::PyxCanvas, a...; k...) = g[:plot](a...; k...)
+stroke(c::PyxCanvas, a...; k...) = c[:stroke](a...; k...)
+pyx_fill(c::PyxCanvas, a...; k...) = c[:fill](a...; k...)
+pyx_text(c::PyxCanvas, a...; k...) = c[:text](a...; k...)
+pyx_insert(c::PyxCanvas, a...; k...) = c[:insert](a...; k...)
 
-function stroke(c::PyObject, args...; kwargs...)
-    # c should be Canvas object
-    return c[:stroke](args...; kwargs...)
-end
+# p should be Path object
+pyx_append(p::PyObject, a...; k...) = p[:append](a...; k...)
 
-function pyx_fill(c::PyObject, args...; kwargs...)
-    # c should be Canvas object
-    return c[:fill](args...; kwargs...)
-end
-
-function pyx_text(c::PyObject, args...; kwargs...)
-    # c should be Canvas object
-    return c[:text](args...; kwargs...)
-end
-
-function pyx_append(p::PyObject, args...; kwargs...)
-    # p should be Path object
-    return p[:append](args...; kwargs...)
-end
-
-function pyx_insert(c::PyObject, args...; kwargs...)
-    # c should be Canvas object
-    return c[:insert](args...; kwargs...)
-end
-
-function writeEPSfile(g::PyObject, args...; kwargs...)
-    return g[:writeEPSfile](args...; kwargs...)
-end
-
-function writePDFfile(g::PyObject, args...; kwargs...)
-    return g[:writePDFfile](args...; kwargs...)
-end
+writeEPSfile(g::PyObject, a...; k...) = g[:writeEPSfile](a...; k...)
+writeEPSfile(c::PyxCanvas, a...; k...) = c[:writeEPSfile](a...; k...)
+writePDFfile(g::PyObject, a...; k...) = g[:writePDFfile](a...; k...)
+writePDFfile(c::PyxCanvas, a...; k...) = c[:writePDFfile](a...; k...)
+writeGSfile(g::PyObject, a...; k...) = g[:writeGSfile](a...; k...)
+writeGSfile(c::PyxCanvas, a...; k...) = c[:writeGSfile](a...; k...)
 
 # Some newer features only in recent (Python3) versions of PyX
 if PyCall.pyversion > v"3"
     export writeSVGfile
-    function writeSVGfile(g::PyObject, args...; kwargs...)
-        return g[:writeSVGfile](args...; kwargs...)
-    end
+    writeSVGfile(g::PyObject, a...; k...) = g[:writeSVGfile](a...; k...)
+    writeSVGfile(c::PyxCanvas, a...; k...) = c[:writeSVGfile](a...; k...)
+    mimewritable(::MIME"image/svg+xml", c::PyxCanvas) = !isempty(c.o[:items])
+    writemime(io::IO, ::MIME"image/svg+xml", c::PyxCanvas) = writeSVGfile(c, io)
+end
+
+##### Actual Meaty Functions
+function __init__()
+    pytype_mapping(canvas.canvas, PyxCanvas)
+end
+
+function pipeGS(g::PyxCanvas, args...; device="png16m", kwargs...)
+    f = g[:pipeGS](args...; device=device, kwargs...)
+    d = f[:read]()
+    f[:close]()
+    return d
 end
 
 end # module PyX
