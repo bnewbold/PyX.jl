@@ -42,8 +42,8 @@ writemime(io::IO, ::MIME"application/pdf", c::PyxCanvas) = writePDFfile(c, io)
 writemime(io::IO, ::MIME"application/eps", c::PyxCanvas) = writeEPSfile(c, io)
 writemime(io::IO, ::MIME"image/eps", c::PyxCanvas) = writeEPSfile(c, io)
 writemime(io::IO, ::MIME"application/postscript", c::PyxCanvas) = writePSfile(c, io)
-writemime(io::IO, ::MIME"image/png", c::PyxCanvas) = writeGSfile(c, io, "png16m")
-writemime(io::IO, ::MIME"image/jpeg", c::PyxCanvas) = writeGSfile(c, io, "jpeg")
+writemime(io::IO, ::MIME"image/png", c::PyxCanvas) = write(io, pipeGS(c; device="png16m"))
+writemime(io::IO, ::MIME"image/jpeg", c::PyxCanvas) = write(io, pipeGS(c; device="jpeg"))
 
 ####### Exports
 export canvas, path, deco, deco_stroked, deco_filled
@@ -54,7 +54,7 @@ export graph, graph_axis, graph_axis_painter, graph_data, graph_style, graph_sty
 export graph_graphxyz, graph_data_function
 export epsfile, deformer, trafo, attr, metapost_path
 export plot, stroke
-export writeEPSfile, writePDFfile, writeGSfile, pipeGS
+export writeEPSfile, writePDFfile, writePSfile, writeGSfile, pipeGS
 export pyx_fill, pyx_append, pyx_insert, pyx_text
 # See also Python3 section at end
 
@@ -109,8 +109,10 @@ writeEPSfile(g::PyObject, a...; k...) = g[:writeEPSfile](a...; k...)
 writeEPSfile(c::PyxCanvas, a...; k...) = c[:writeEPSfile](a...; k...)
 writePDFfile(g::PyObject, a...; k...) = g[:writePDFfile](a...; k...)
 writePDFfile(c::PyxCanvas, a...; k...) = c[:writePDFfile](a...; k...)
-writeGSfile(g::PyObject, a...; k...) = g[:writeGSfile](a...; k...)
-writeGSfile(c::PyxCanvas, a...; k...) = c[:writeGSfile](a...; k...)
+writePSfile(g::PyObject, a...; k...) = g[:writePSfile](a...; k...)
+writePSfile(c::PyxCanvas, a...; k...) = c[:writePSfile](a...; k...)
+writeGSfile(g::PyObject, filename::AbstractString, a...; k...) = g[:writeGSfile](filename, a...; k...)
+writeGSfile(c::PyxCanvas, filename::AbstractString, a...; k...) = c[:writeGSfile](filename, a...; k...)
 
 # Some newer features only in recent (Python3) versions of PyX
 if PyCall.pyversion > v"3"
