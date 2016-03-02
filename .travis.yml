@@ -1,0 +1,27 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+sudo: required
+dist: trusty
+os:
+  - linux
+  - osx
+julia:
+  - release
+  - nightly
+  - 0.4
+# Note: deps are tricky! Need full TeX/LaTeX, etc
+before_install:
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update              ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y python-pyx   ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update > /dev/null                ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask > /dev/null; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install mactex > /dev/null   ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo pip install PyX                   ; fi
+ - python -c "import pyx; print(pyx.__version__)"
+notifications:
+  email: false
+# Default test script didn't work
+script:
+ - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+ - julia -e 'Pkg.clone(pwd()); Pkg.build("PyX"); Pkg.test("PyX"; coverage=true)'
+

@@ -1,3 +1,4 @@
 - lots of temporary files (.log, .dvi, etc) get left around. need to somehow
   tell python to exit cleanly at the end, and maybe also use a different
   temporary directory.
+- travis: figure out how to do both Python2 and Python3 tests
