@@ -1,7 +1,23 @@
 
+println("Importing libs...")
 include("../src/PyX.jl")
 using PyX
+using LaTeXStrings
+using Base.Test
 
+##### Setup Common Objects
+println("Creating test objects...")
+include("test_objects.jl")
+
+##### MIME and Ghostscript output
+println("MIME and Ghostscript tests...")
+
+include("test_gs.jl")
+include("test_mime.jl")
+
+##### Run all the examples
+
+println("Drawing...")
 include("../examples/drawing/arrow.jl")
 #include("../examples/drawing/metapost.jl") # Python3 only?
 include("../examples/drawing/pathitem.jl")
@@ -15,6 +31,7 @@ include("../examples/drawing2d/insert.jl")
 include("../examples/drawing2d/parallel.jl")
 include("../examples/drawing2d/smoothed.jl")
 
+println("Graphs...")
 include("../examples/splitgraphs/minimal.jl")
 include("../examples/splitgraphs/splitatvalue.jl")
 
@@ -39,7 +56,9 @@ include("../examples/graphstyles/usesymbol.jl")
 include("../examples/graphstyles/errorbar.jl")
 include("../examples/graphstyles/density.jl")
 
+println("3D Graphs...")
 include("../examples/3dgraphs/bar.jl")
 include("../examples/3dgraphs/color.jl")
 include("../examples/3dgraphs/grid.jl")
 include("../examples/3dgraphs/surface.jl")
+
