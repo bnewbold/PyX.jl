@@ -1,3 +1,5 @@
+PyX Graphics for Julia
+=============================================================================
 
 This is a Julia wrapper of the PyX plotting and TeX graphics library from
 Python.
@@ -5,8 +7,9 @@ Python.
 It is a work in progress, broken, and will set your computer on fire. See also
 the TODO file.
 
-*Source Code:* https://github.com/bnewbold/PyX.jl
-*Travis CI:* https://travis-ci.org/bnewbold/PyX.jl
+**Source Code:** https://github.com/bnewbold/PyX.jl
+
+**Travis CI:** https://travis-ci.org/bnewbold/PyX.jl
 
 ## Example
 
@@ -15,12 +18,20 @@ using PyX
 
 g = graph.graphxy(width=8)
 plot(g, graph_data_function("y(x)=sin(x)/x", min=-15, max=15))
+writePDFfile(g, "example_graph.pdf")
 ```
+
+Plotting works automagically from within Jupyter and other graphic interfaces:
+
+![Jupyter Example Image](examples/jupyter_example_graph.png "Jupyter Example Image")
+
 
 There are many (ported) examples in the ./examples/ directory of this
 repository. See the Python PyX upstream documentation for example outputs:
+<http://pyx.sourceforge.net/>
 
-    http://pyx.sourceforge.net/
+For pipeGS (ghostscript file conversion) output "device" options, see:
+<http://www.ghostscript.com/doc/current/Devices.htm>
 
 ## Dependencies and Python Version
 
@@ -39,7 +50,7 @@ Careful! If you decide to do this, run:
     julia> ENV["PYTHON"] = "/usr/bin/python3" # Or your local full path
     julia> Pkg.build("PyCall")
 
-### Install
+## Installation
 
 This package is not (yet) listed in the official Julia MANIFEST.jl index, so
 you'll need to install it "unregistered" style:
@@ -47,34 +58,42 @@ you'll need to install it "unregistered" style:
     julia> Pkg.clone("https://github.com/bnewbold/PyX.jl")
     julia> using PyX
 
-## Notes and Caveats
-
 To run tests, do something like:
 
     JULIA_LOAD_PATH=src julia test/runtests.jl
 
-PyX >= 0.13 (2013) is Python3 only. PyX <= 0.12.1 is Python2.
+## Differences from Python
 
-Instead of Python's `None`, use Julia's `nothing`.
+All the expected [Julia/Python differences][1] apply:
 
-`graph_data.function` won't work in Julia because `function` is a reserved
-word. Use `graph_data_function` instead.
+ * use Julia's `nothing` instead of Python's `None`
+ * use 1-indexing instead of 0-indexing, and require `end` in slice syntax
+ * function calls like `writeEPSfile(c, filename)` instead of object method
+   calls like `c.writeEPSfile(filename)`.
+
+Note that the string code snippets that go into `graph_data_function` are still
+Python code, not Julia.
+
+There doesn't seem to be an easy way to handle nested Python modules as nested
+modules in Julia, so there can only be a single `.` separator in variable and
+function names. This has been worked around by using the underscore character
+(`_`) instead of `.` for all but the last separator. So, eg,
+`graph_axis.split()` instead of `graph.axis.split()` and `color_rgb.red`
+instead of `color.rgb.red`.
 
 To avoid namespace collisions or confusion with built-in Julia functions the
-following functions have "pyx_" preprended to the function name:
+following functions (only) have `pyx_` preprended to the function name:
 
     pyx_fill, pyx_append, pyx_insert, pyx_text
 
-Also check the TODO file.
+`function` is also a reserved keyword in Julia, so use `graph_data_function`
+instead of `graph_data.function`.
 
-For pipeGS (ghostscript file conversion) output, see:
-http://www.ghostscript.com/doc/current/Devices.htm
+[1]: http://docs.julialang.org/en/stable/manual/noteworthy-differences/#noteworthy-differences-from-python)
 
 ## License
 
 Following the license of the underlying PyX python library, this wrapper is
 licensed under the GNU GPL Version 2 (or later). See the LICENSE file, and the
-upstream licensing note:
-
-    http://pyx.sourceforge.net/license.html
+upstream licensing note: <http://pyx.sourceforge.net/license.html>
 
