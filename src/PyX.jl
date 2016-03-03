@@ -42,8 +42,8 @@ writemime(io::IO, ::MIME"application/pdf", c::PyxCanvas) = writePDFfile(c, io)
 writemime(io::IO, ::MIME"application/eps", c::PyxCanvas) = writeEPSfile(c, io)
 writemime(io::IO, ::MIME"image/eps", c::PyxCanvas) = writeEPSfile(c, io)
 writemime(io::IO, ::MIME"application/postscript", c::PyxCanvas) = writePSfile(c, io)
-writemime(io::IO, ::MIME"image/png", c::PyxCanvas) = write(io, pipeGS(c; device="png16m"))
-writemime(io::IO, ::MIME"image/jpeg", c::PyxCanvas) = write(io, pipeGS(c; device="jpeg"))
+writemime(io::IO, ::MIME"image/png", c::PyxCanvas) = write(io, pipeGS(c, "png16m"))
+writemime(io::IO, ::MIME"image/jpeg", c::PyxCanvas) = write(io, pipeGS(c, "jpeg"))
 
 ####### Exports
 export canvas, path, deco, deco_stroked, deco_filled
@@ -128,7 +128,7 @@ function __init__()
     pytype_mapping(canvas.canvas, PyxCanvas)
 end
 
-function pipeGS(g::PyxCanvas, args...; device="png16m", kwargs...)
+function pipeGS(g::PyxCanvas, device="png16m", args...; kwargs...)
     f = g[:pipeGS](args...; device=device, kwargs...)
     d = f[:read]()
     f[:close]()
