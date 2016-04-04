@@ -11,11 +11,8 @@
 # PyCall.
 
 _pyrecwrap_cache = Dict{PyObject,Module}()
-_pyx_module_skiplist = Set{ASCIIString}(["math", "os", "sys", "ast", "bytearray", "random", "errno",
-    "shutil", "zlib", "copy", "base64", "array", "importlib", "glob", "email", "xml",
-    "binascii", "encodings", "io", "tarfile", "threading", "itertools", "logging", "collections"])
 
-function pyrecwrap(o::PyObject, mname::Symbol=:__anon__; skiplist=_pyx_module_skiplist)
+function pyrecwrap(o::PyObject, mname::Symbol=:__anon__)
     members = convert(Vector{Tuple{AbstractString,PyObject}},
                       pycall(PyCall.inspect["getmembers"], PyObject, o))
     if PyCall.pyversion >= v"3"
@@ -28,7 +25,6 @@ function pyrecwrap(o::PyObject, mname::Symbol=:__anon__; skiplist=_pyx_module_sk
         filter!(m -> !(m[1] == PyCall.inspect), members)
     end
     filter!(m -> !(m[1] in PyCall.reserved), members)
-    filter!(m -> !(m[1] in skiplist), members)
     m = Module(mname, false)
     # Preload module cache with this (so far empty) module
     _pyrecwrap_cache[o] = m
@@ -41,7 +37,7 @@ function pyrecwrap(o::PyObject, mname::Symbol=:__anon__; skiplist=_pyx_module_sk
             end
             # Before recursing, check if we've seen this python module before
             if !haskey(_pyrecwrap_cache, mo)
-                _pyrecwrap_cache[mo] = pyrecwrap(mo, skiplist=skiplist)
+                _pyrecwrap_cache[mo] = pyrecwrap(mo)
             end
             mm = _pyrecwrap_cache[mo]
             push!(consts, Expr(:const, Expr(:(=), symbol(ms), mm)))
