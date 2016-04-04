@@ -30,7 +30,8 @@ function pyrecwrap(o::PyObject, mname::Symbol=:__anon__)
     _pyrecwrap_cache[o] = m
     consts = Expr[]
     for (ms, mo) in members     # ms is Symbol, mo is PyObject)
-        if pyisinstance(mo, PyCall.@pyglobalobj :PyModule_Type)
+        if pyisinstance(mo, PyCall.@pyglobalobj :PyModule_Type) ||
+                pyisinstance(mo, PyCall.@pyglobalobj :PyType_Type)
             if mo == PyCall.inspect
                 continue
             end
