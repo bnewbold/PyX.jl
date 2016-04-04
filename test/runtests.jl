@@ -3,7 +3,12 @@ println("Importing libs...")
 include("../src/PyX.jl")
 using PyX
 using LaTeXStrings
+using PyCall
 using Base.Test
+
+##### Helpers
+println("Testing helpers...")
+include("test_pyrecwrap.jl")
 
 ##### Setup Common Objects
 println("Creating test objects...")
