@@ -1,0 +1,48 @@
+
+### Problems With Python/Julia Syntax Mapping with dot ('.') Operator
+
+*aka, why the annoying underscore syntax is needed*
+
+Using PyCall, we can map python modules to Julia modules with the same syntax:
+
+    python> import os
+    python> os.uname()
+    python> os.O_RDONLY
+
+    julia> using PyCall
+    julia> os = pywrap(pyimport("os"))
+    julia> os.uname()
+    julia> os.O_RDONLY
+
+And using a recursive version of pywrap (`pyrecwrap`), we can get nested
+modules to map also:
+
+    python> import os
+    python> os.path.genericpath.os.uname()
+
+    julia> os = pyrecwrap(pyimport("os"))
+    julia> os.path.genericpath.os.uname()
+
+We can also map python classes to Julia modules:
+
+    python> import pyx.style.linewidth as psl
+    python> psl.THICK
+
+    julia> ps = pywrap(pyimport("pyx.style"))
+    julia> psl = pywrap(ps.linewidth)
+    julia> psl.THICK
+
+However, in Python a class/object can both have members and be called as an
+initializer:
+
+    python> psl.THIN
+    python> psl(0.1)
+
+But in Julia a Module can't act as a function.
+
+Thus, a one-to-one syntax mapping just isn't going to work until (unless?) the
+dot ('.') operator can be overridden (as of Julia 0.4 it may not).
+
+The work around used in this project (PyX.jl) is to use underscores in
+object/function names and dots in object/module names. Eg,
+`style.linewidth(0.2)` vs. `style_linewidth.THICK`.

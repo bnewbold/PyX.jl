@@ -74,12 +74,25 @@ All the expected [Julia/Python differences][1] apply:
 Note that the string code snippets that go into `graph_data_function` are still
 Python code, not Julia.
 
-There doesn't seem to be an easy way to handle nested Python modules as nested
-modules in Julia, so there can only be a single `.` separator in variable and
-function names. This has been worked around by using the underscore character
-(`_`) instead of `.` for all but the last separator. So, eg,
-`graph_axis.split()` instead of `graph.axis.split()` and `color_rgb.red`
-instead of `color.rgb.red`.
+Because the Python syntax features for objects (they can both be accessed like
+a module or called like a function) does not map to any Julia type at this
+time, a naming convention is used such that only a single `.` separator is used
+in Julia names and calls, and underscore characters (`_`) are used in
+objects-as-modules to access attributes. For example:
+
+    python> from pyx import style, color, graph
+    python> style.linewidth.THICK
+    python> style.linewidth(0.5)
+    python> color.rgb.red
+    python> graph.axis.split()
+    
+    julia> using PyX
+    julia> style_linewidth.THICK
+    julia> style.linewidth(0.5)
+    julia> color_rgb.red
+    julia> graph_axis.split()
+
+See HACKING for more details.
 
 To avoid namespace collisions or confusion with built-in Julia functions the
 following functions (only) have `pyx_` preprended to the function name:
