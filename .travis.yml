@@ -12,14 +12,34 @@ julia:
 # Note: deps are tricky! Need full TeX/LaTeX, etc
 before_install:
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update              ; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y python-pyx python3-pip  ; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip3 install PyX                ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y python-pyx python3-pip python-pip ; fi
+ # Yes, we really do need to double-install PyX with both apt-get and pip here!
+ # See: https://github.com/travis-ci/travis-ci/issues/4989 (python path)
+ # Also: https://github.com/travis-ci/travis-ci/issues/1705 (pip permissions)
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install --user -I PyX==0.12.1    ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip3 install --user PyX              ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update > /dev/null                ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask > /dev/null; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install mactex > /dev/null   ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo pip install PyX                   ; fi
+ # Python stuff on Travis CI seems to be a total mess. The below should work circa April 2016.
+ # Note the output of the below debugging statements... the default python
+ # environment on the path is under /opt, and is different for the regular user
+ # vs. sudo/root, and pip/pip3 may also get confused about paths
+ - which python2
+ - which python3
+ - sudo which python2
+ - sudo which python3
+ - python2 -c "import sys; print(sys.path)"
+ - python3 -c "import sys; print(sys.path)"
+ - pip freeze
+ - pip3 freeze
  - python2 -c "import pyx; print(pyx.__version__)"
  - python3 -c "import pyx; print(pyx.__version__)"
+ - /usr/bin/python2 -c "import pyx; print(pyx.__version__)"
+ - /opt/python/3.5.0/bin/python3 -c "import pyx; print(pyx.__version__)"
+ # This line would fail!
+ #- /usr/bin/python3 -c "import pyx; print(pyx.__version__)"
  - julia -e 'Pkg.update()'
  - julia -e 'Pkg.add("PyCall")'
 notifications:
@@ -30,5 +50,5 @@ script:
  - julia -e 'Pkg.clone(pwd());'
  - julia -e 'ENV["PYTHON"] = "/usr/bin/python2"; Pkg.build("PyCall")'
  - julia -e 'Pkg.build("PyX"); Pkg.test("PyX"; coverage=true)'
- - julia -e 'ENV["PYTHON"] = "/usr/bin/python3"; Pkg.build("PyCall")'
+ - julia -e 'ENV["PYTHON"] = "/opt/python/3.5.0/bin/python3"; Pkg.build("PyCall")'
  - julia -e 'Pkg.build("PyX"); Pkg.test("PyX"; coverage=true)'
