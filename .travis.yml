@@ -12,16 +12,23 @@ julia:
 # Note: deps are tricky! Need full TeX/LaTeX, etc
 before_install:
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update              ; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y python-pyx   ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y python-pyx python3-pip  ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip3 install PyX                ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update > /dev/null                ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install caskroom/cask/brew-cask > /dev/null; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install mactex > /dev/null   ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo pip install PyX                   ; fi
- - python -c "import pyx; print(pyx.__version__)"
+ - python2 -c "import pyx; print(pyx.__version__)"
+ - python3 -c "import pyx; print(pyx.__version__)"
+ - julia -e 'Pkg.update()'
+ - julia -e 'Pkg.add("PyCall")'
 notifications:
   email: false
 # Default test script didn't work
 script:
  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
- - julia -e 'Pkg.clone(pwd()); Pkg.build("PyX"); Pkg.test("PyX"; coverage=true)'
-
+ - julia -e 'Pkg.clone(pwd());'
+ - julia -e 'ENV["PYTHON"] = "/usr/bin/python2"; Pkg.build("PyCall")'
+ - julia -e 'Pkg.build("PyX"); Pkg.test("PyX"; coverage=true)'
+ - julia -e 'ENV["PYTHON"] = "/usr/bin/python3"; Pkg.build("PyCall")'
+ - julia -e 'Pkg.build("PyX"); Pkg.test("PyX"; coverage=true)'
