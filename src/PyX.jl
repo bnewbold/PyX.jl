@@ -2,12 +2,13 @@
 module PyX
 
 ####### Required and over-written
+# LaTeXStrings is strongly recommended but not required
 using PyCall
 import PyCall: pycall
 import Base: convert, ==, isequal, hash, writemime, getindex, setindex!, haskey, keys, show, mimewritable
 
-
-# LaTeXStrings is strongly recommended but not required
+####### Helpers
+include("pyrecwrap.jl")
 
 ####### Types
 export PyxCanvas
@@ -58,7 +59,7 @@ export writeEPSfile, writePDFfile, writePSfile, writeGSfile, pipeGS
 export pyx_fill, pyx_append, pyx_insert, pyx_text
 # See also Python3 section at end
 
-####### Create virtual (pywrap) Julia modules for PyX python sub-modules
+####### Create virtual (pywrap) Julia modules for PyX python classes
 canvas = pywrap(pyimport("pyx.canvas"))
 path = pywrap(pyimport("pyx.path"))
 deco = pywrap(pyimport("pyx.deco"))
@@ -88,11 +89,18 @@ graph_key = pywrap(graph.key)
 graph_style = pywrap(graph.style)
 graph_style_symbol = pywrap(graph_style.symbol)
 graph_graphxyz = pywrap(graph.graphxyz)
+graph = pywrap(pyimport("pyx.graph"))
 epsfile = pywrap(pyimport("pyx.epsfile"))
 deformer = pywrap(pyimport("pyx.deformer"))
 trafo = pywrap(pyimport("pyx.trafo"))
 attr = pywrap(pyimport("pyx.attr"))
 metapost_path = pywrap(pyimport("pyx.metapost.path"))
+
+####### Re-wrap Some Modules Recursively
+deco = pyrecwrap(pyimport("pyx.deco"))
+style = pyrecwrap(pyimport("pyx.style"))
+color = pyrecwrap(pyimport("pyx.color"))
+text = pyrecwrap(pyimport("pyx.text"))
 
 ####### Wrapper Functions
 plot(g::PyObject, a...; k...) = g[:plot](a...; k...)
