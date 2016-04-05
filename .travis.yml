@@ -4,7 +4,7 @@ sudo: required
 dist: trusty
 os:
   - linux
-  - osx
+  #- osx # Disabled because 'mactex' is too huge (2+ GB) for Travis CI to install reliably
 julia:
   - release
   - nightly
