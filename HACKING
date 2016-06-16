@@ -14,8 +14,8 @@ Using PyCall, we can map python modules to Julia modules with the same syntax:
     julia> os.uname()
     julia> os.O_RDONLY
 
-And using a recursive version of pywrap (`pyrecwrap`), we can get nested
-modules to map also:
+And using a recursive version of pywrap (`pyrecwrap`, see below), we can get
+nested modules to map also:
 
     python> import os
     python> os.path.genericpath.os.uname()
@@ -46,3 +46,6 @@ dot ('.') operator can be overridden (as of Julia 0.4 it may not).
 The work around used in this project (PyX.jl) is to use underscores in
 object/function names and dots in object/module names. Eg,
 `style.linewidth(0.2)` vs. `style_linewidth.THICK`.
+
+Note: pyrecwrap can be found in the "pyrecwrap" branch of this repo, or at
+https://gist.github.com/bnewbold/b9a701e06b9da319a58dc9526b09c4a5
