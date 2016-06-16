@@ -7,7 +7,8 @@ os:
   #- osx # Disabled because 'mactex' is too huge (2+ GB) for Travis CI to install reliably
 julia:
   - release
-  - nightly
+  #- nightly # Disabled because nightly seems to be moving fast and breaking things
+             # will support 0.5 when it is released
   - 0.4
 # Note: deps are tricky! Need full TeX/LaTeX, etc
 before_install:
