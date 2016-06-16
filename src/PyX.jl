@@ -58,41 +58,7 @@ export writeEPSfile, writePDFfile, writePSfile, writeGSfile, pipeGS
 export pyx_fill, pyx_append, pyx_insert, pyx_text
 # See also Python3 section at end
 
-####### Create virtual (pywrap) Julia modules for PyX python sub-modules
-canvas = pywrap(pyimport("pyx.canvas"))
-path = pywrap(pyimport("pyx.path"))
-deco = pywrap(pyimport("pyx.deco"))
-deco_stroked = pywrap(deco.stroked)
-deco_filled = pywrap(deco.filled)
-style = pywrap(pyimport("pyx.style"))
-style_linewidth = pywrap(style.linewidth)
-style_linestyle = pywrap(style.linestyle)
-style_linejoin = pywrap(style.linejoin)
-style_linecap = pywrap(style.linecap)
-color = pywrap(pyimport("pyx.color"))
-color_rgb = pywrap(color.rgb)
-color_gray = pywrap(color.gray)
-color_gradient = pywrap(color.gradient)
-color_rgbgradient = pywrap(color.rgbgradient)
-connector = pywrap(pyimport("pyx.connector"))
-text = pywrap(pyimport("pyx.text"))
-text_halign = pywrap(text.halign)
-text_valign = pywrap(text.valign)
-box = pywrap(pyimport("pyx.box"))
-graph = pywrap(pyimport("pyx.graph"))
-graph_axis = pywrap(graph.axis)
-graph_axis_painter = pywrap(graph_axis.painter)
-graph_data = pywrap(graph.data)
-graph_data_function = graph.data[:function]
-graph_key = pywrap(graph.key)
-graph_style = pywrap(graph.style)
-graph_style_symbol = pywrap(graph_style.symbol)
-graph_graphxyz = pywrap(graph.graphxyz)
-epsfile = pywrap(pyimport("pyx.epsfile"))
-deformer = pywrap(pyimport("pyx.deformer"))
-trafo = pywrap(pyimport("pyx.trafo"))
-attr = pywrap(pyimport("pyx.attr"))
-metapost_path = pywrap(pyimport("pyx.metapost.path"))
+####### Actual pyimports happen in __init__()
 
 ####### Wrapper Functions
 plot(g::PyObject, a...; k...) = g[:plot](a...; k...)
@@ -125,6 +91,47 @@ end
 
 ##### Actual Meaty Functions
 function __init__()
+
+    # Create actual (pywrap) Julia modules for PyX python sub-modules.
+    # These happen here in __init__() (and thus assign globals) for
+    # pre-compilation safety.
+    # See: https://github.com/stevengj/PyCall.jl#using-pycall-from-julia-modules)
+    global canvas = pywrap(pyimport("pyx.canvas"));
+    global path = pywrap(pyimport("pyx.path"))
+    global deco = pywrap(pyimport("pyx.deco"))
+    global deco_stroked = pywrap(deco.stroked)
+    global deco_filled = pywrap(deco.filled)
+    global style = pywrap(pyimport("pyx.style"))
+    global style_linewidth = pywrap(style.linewidth)
+    global style_linestyle = pywrap(style.linestyle)
+    global style_linejoin = pywrap(style.linejoin)
+    global style_linecap = pywrap(style.linecap)
+    global color = pywrap(pyimport("pyx.color"))
+    global color_rgb = pywrap(color.rgb)
+    global color_gray = pywrap(color.gray)
+    global color_gradient = pywrap(color.gradient)
+    global color_rgbgradient = pywrap(color.rgbgradient)
+    global connector = pywrap(pyimport("pyx.connector"))
+    global text = pywrap(pyimport("pyx.text"))
+    global text_halign = pywrap(text.halign)
+    global text_valign = pywrap(text.valign)
+    global box = pywrap(pyimport("pyx.box"))
+    global graph = pywrap(pyimport("pyx.graph"))
+    global graph_axis = pywrap(graph.axis)
+    global graph_axis_painter = pywrap(graph_axis.painter)
+    global graph_data = pywrap(graph.data)
+    global graph_data_function = graph.data[:function]
+    global graph_key = pywrap(graph.key)
+    global graph_style = pywrap(graph.style)
+    global graph_style_symbol = pywrap(graph_style.symbol)
+    global graph_graphxyz = pywrap(graph.graphxyz)
+    global epsfile = pywrap(pyimport("pyx.epsfile"))
+    global deformer = pywrap(pyimport("pyx.deformer"))
+    global trafo = pywrap(pyimport("pyx.trafo"))
+    global attr = pywrap(pyimport("pyx.attr"))
+    global metapost_path = pywrap(pyimport("pyx.metapost.path"))
+
+    # non-wrapping portion of __init__()
     pytype_mapping(canvas.canvas, PyxCanvas)
 end
 
