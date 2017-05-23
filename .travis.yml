@@ -38,8 +38,9 @@ before_install:
  - python2 -c "import pyx; print(pyx.__version__)"
  - python3 -c "import pyx; print(pyx.__version__)"
  - /usr/bin/python2 -c "import pyx; print(pyx.__version__)"
- - /opt/python/3.5.0/bin/python3 -c "import pyx; print(pyx.__version__)"
- # This line would fail!
+ - ls /opt/python/* || true
+ - ls /usr/bin/python3 || true
+ - /opt/python/3.5.2/bin/python3 -c "import pyx; print(pyx.__version__)"
  #- /usr/bin/python3 -c "import pyx; print(pyx.__version__)"
  - julia -e 'Pkg.update()'
  - julia -e 'Pkg.add("PyCall")'
