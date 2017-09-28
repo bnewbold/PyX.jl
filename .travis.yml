@@ -8,8 +8,7 @@ os:
 julia:
   - 0.4
   - 0.5
-  #- nightly # Disabled because nightly seems to be moving fast and breaking things
-             # will support 0.5 when it is released
+  - 0.6
 # Note: deps are tricky! Need full TeX/LaTeX, etc
 before_install:
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update              ; fi
